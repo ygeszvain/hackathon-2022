@@ -4,16 +4,18 @@
 
 ## Overview
 
-This modular pipeline splits the incoming data into the train and test subsets (`split_data` node)
+This modular pipeline illustrates a PySpark-based data engineering pipeline which:
+1. Extracting, transforming and selecting features from the dataset (`transform_features` node)
+2. Split the dataset into training dataset and testing dataset based on a configurable ratio (`split_data` node)
 
 ## Pipeline inputs
 
 ### `example_iris_data`
 
-|             |                                              |
-| ----------- | -------------------------------------------- |
-| Type        | `pandas.DataFrame`                           |
-| Description | Input data to split into train and test sets |
+|             |                                                          |
+| ----------- | ---------------------------------------------------------| 
+| Type        | `spark.SparkDataSet`                                     |
+| Description | Input data to perform features engineering and splitting |
 
 ### `params:example_test_data_ratio`
 
@@ -24,30 +26,16 @@ This modular pipeline splits the incoming data into the train and test subsets (
 
 ## Pipeline outputs
 
-### `example_train_x`
+### `training_data`
 
-|             |                                         |
-| ----------- | --------------------------------------- |
-| Type        | `pandas.DataFrame`                      |
-| Description | DataFrame containing train set features |
+|             |                                                |
+| ----------- | ---------------------------------------------- |
+| Type        | `pyspark.sql.DataFrame`                        |
+| Description | DataFrame containing the training dataset      |
 
-### `example_train_y`
+### `testing_data`
 
-|             |                                                                |
-| ----------- | -------------------------------------------------------------- |
-| Type        | `pandas.DataFrame`                                             |
-| Description | DataFrame containing train set one-hot encoded target variable |
-
-### `example_test_x`
-
-|             |                                        |
-| ----------- | -------------------------------------- |
-| Type        | `pandas.DataFrame`                     |
-| Description | DataFrame containing test set features |
-
-### `example_test_y`
-
-|      |                    |
-| ---- | ------------------ |
-| Type | `pandas.DataFrame` |
-| Description | DataFrame containing test set one-hot encoded target variable |
+|             |                                                |
+| ----------- | ---------------------------------------------- |
+| Type        | `pyspark.sql.DataFrame`                        |
+| Description | DataFrame containing testing dataset           |

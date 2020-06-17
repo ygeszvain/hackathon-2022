@@ -4,60 +4,41 @@
 
 ## Overview
 
-This modular pipeline:
-1. trains a simple multi-class logistic regression model (`train_model` node)
-2. makes predictions given a trained model from (1) and a test set (`predict` node)
-3. reports the model accuracy on a test set (`report_accuracy` node)
+This modular pipeline illustrates a PySpark-based data science pipeline which:
+1. Trains a simple random forest classifier (`train_model` node)
+2. Makes predictions given a trained model (`predict` node)
+3. Reports the model's predictions accuracy (`report_accuracy` node)
 
 
 ## Pipeline inputs
 
-### `example_train_x`
+### `training_data`
 
-|             |                                         |
-| ----------- | --------------------------------------- |
-| Type        | `pandas.DataFrame`                      |
-| Description | DataFrame containing train set features |
+|             |                                                |
+| ----------- | ---------------------------------------------- |
+| Type        | `pyspark.sql.DataFrame`                        |
+| Description | DataFrame containing the training dataset      |
 
-|             |                                         |
-| ----------- | --------------------------------------- |
-| Type        | `pandas.DataFrame`                      |
-| Description | DataFrame containing train set one-hot encoded target variable |
+### `testing_data`
 
-### `example_train_y`
-
-|             |                                                                |
-| ----------- | -------------------------------------------------------------- |
-| Type        | `pandas.DataFrame`                                             |
-| Description | DataFrame containing train set one-hot encoded target variable |
-
-### `example_test_x`
-
-|             |                                               |
-| ----------- | --------------------------------------------- |
-| Type        | `pandas.DataFrame`                            |
-| Description | DataFrame containing test set features        |
-
-### `example_test_y`
-
-|             |                                                               |
-| ----------- | ------------------------------------------------------------- |
-| Type        | `pandas.DataFrame`                                            |
-| Description | DataFrame containing test set one-hot encoded target variable |
+|             |                                                |
+| ----------- | ---------------------------------------------- |
+| Type        | `pyspark.sql.DataFrame`                        |
+| Description | DataFrame containing testing dataset           |
 
 ### `parameters`
 
 |      |                    |
 | ---- | ------------------ |
 | Type | `dict` |
-| Description | Project parameter dictionary that must contain the following keys: `example_num_train_iter` (number of model training iterations), `example_learning_rate` (learning rate for gradient descent) |
+| Description | Project parameter dictionary specifying the following key: `example_num_trees` (number of trees to train the random forest classifier) |
 
 
 ## Pipeline outputs
 
-### `example_model`
+### `example_classifier`
 
 |             |                                   |
 | ----------- | --------------------------------- |
-| Type        | `numpy.ndarray`                   |
+| Type        | `RandomForestClassifier`          |
 | Description | Example logistic regression model |

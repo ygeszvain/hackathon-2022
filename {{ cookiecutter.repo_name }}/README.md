@@ -2,10 +2,10 @@
 
 ## Overview
 
-This is your new Kedro project, which was generated using `Kedro {{ cookiecutter.kedro_version }}` by running:
+This is your new Kedro project with some initial Spark configurations and an example pipeline, which was generated using `Kedro {{ cookiecutter.kedro_version }}` by running:
 
 ```
-kedro new
+kedro new pyspark
 ```
 
 Take a look at the [documentation](https://kedro.readthedocs.io) to get started.
@@ -29,6 +29,8 @@ To install them, run:
 ```
 kedro install
 ```
+
+This project also assumes that a Spark cluster is accessible. Please refer to [Spark documentation](https://spark.apache.org/docs/latest/spark-standalone.html) on how to set one up locally.
 
 ## Running Kedro
 
