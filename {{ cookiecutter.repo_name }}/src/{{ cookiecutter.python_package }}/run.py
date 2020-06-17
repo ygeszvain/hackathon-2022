@@ -53,25 +53,22 @@ class ProjectContext(KedroContext):
     ):
         super().__init__(project_path, env, extra_params)
         self.init_spark_session()
-
-    def init_spark_session(self, yarn=True) -> None:
+    
+    def init_spark_session(self) -> None:
         """Initialises a SparkSession using the config defined in project's conf folder."""
 
+        # Load the spark configuration in spark.yaml using the config loader
         parameters = self.config_loader.get("spark*", "spark*/**")
         spark_conf = SparkConf().setAll(parameters.items())
 
+        # Initialise the spark session
         spark_session_conf = (
-            SparkSession.builder.appName(
-                "{}_{}".format(self.project_name, getpass.getuser())
-            )
+            SparkSession.builder
+            .appName(self.project_name)
             .enableHiveSupport()
             .config(conf=spark_conf)
         )
-        if yarn:
-            _spark_session = spark_session_conf.master("yarn").getOrCreate()
-        else:
-            _spark_session = spark_session_conf.getOrCreate()
-
+        _spark_session = spark_session_conf.getOrCreate()
         _spark_session.sparkContext.setLogLevel("WARN")
 
     project_name = "{{ cookiecutter.project_name }}"
