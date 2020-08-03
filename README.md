@@ -1,37 +1,40 @@
-# Kedro Starter: PySpark with example
+# The `kedro-starter-pyspark-iris` Kedro starter
 
 ## Introduction
 
-This repository contains a Kedro project template with some initial configurations and an example pipeline to demonstrate best practices when using Kedro with PySpark. It originates from our [Working with PySpark](https://kedro.readthedocs.io/en/stable/04_user_guide/09_pyspark.html) guide.
+The code in this repository demonstrates best practice when working with Kedro and PySpark. It contains a Kedro starter template with some initial configuration and an example pipeline, and originates from the [Kedro documentation about how to work with PySpark](https://kedro.readthedocs.io/en/stable/10_tools_integration/01_pyspark.html).
 
 ## Features
 
-### Spark's configuration in one place, i.e. `/conf/base/spark.yml`
+### Single configuration in `/conf/base/spark.yml`
 
-Spark allows you to specify many different [configurations options](https://spark.apache.org/docs/latest/configuration.html). This starter codifies the use of `/conf/base/spark.yml` as the configuration file for these options.
+While Spark allows you to specify many different [configuration options](https://spark.apache.org/docs/latest/configuration.html), this starter uses `/conf/base/spark.yml` as a single configuration location.
 
 
 ### `SparkSession` initialisation
 
-This starter contains the initialisation code for `SparkSession` in the `ProjectContext` by reading the configuration from `/conf/base/spark.yml`. You should modify this code if you want to further customise your `SparkSession`, e.g. configuring it to use YARN.
+This Kedro starter contains the initialisation code for `SparkSession` in the `ProjectContext` and takes its configuration from `/conf/base/spark.yml`. Modify this code if you want to further customise your `SparkSession`, e.g. to use [YARN](https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YARN.html).
 
-### Usage of `MemoryDataSet` when working with Spark objects
+### Configures `MemoryDataSet` to work with Spark objects
+Out of the box, Kedro's `MemoryDataSet` works with Spark's `DataFrame`. However, it doesn't work with other Spark objects such as machine learning models unless you add further configuration. This Kedro starter demonstrates how to configure `MemoryDataSet` for Spark's machine learning model in the `catalog.yml`.
 
-Out of the box, `MemoryDataSet` works with Spark's `DataFrame`. However, it doesn't work with other Spark's objects such as machine learning models without further configuration. This starter demonstrates how you can configure `MemoryDataSet` for a Spark's machine learning model in the `catalog.yml`.
+> Note: The use of `MemoryDataSet` is encouraged to propagate Spark's `DataFrame` between nodes in the pipeline. A best practice is delay triggering Spark actions for as long as needed to take advantage of Spark's lazy evaluation.
 
-Note that the use of `MemoryDataSet` is encouraged to propagate Spark's `DataFrame` between nodes in the pipeline. A best practice is delay triggering Spark actions for as long as needed to take advantage of the Spark's lazy evaluation.
-
-### An example maching learning pipeline using only `PySpark` and `Kedro`
+### An example machine learning pipeline that uses only `PySpark` and `Kedro`
 
 ![](./images/spark_iris_pipeline.png)
 
-This starter contains the code for an example machine learning pipeline that trains a random forrest classifier to classify iris based on the popular iris dataset. The pipeline includes two modular pipelines: a data engineering one and a data science one.
+This Kedro starter uses the simple and familiar [Iris dataset](https://www.kaggle.com/uciml/iris). It contains the code for an example machine learning pipeline that trains a random forest classifier to classify an iris. 
+
+The pipeline includes two modular pipelines: one for data engineering and one for data science.
 
 The data engineering pipeline includes:
-* A node to transform multiple features into a single-column features vector using `VectorAssembler`, as well as convert a textual represntation of the label column into a numerical one using `StringIndexer`
-* A node to split the transformed data into training dataset and testing dataset using a configurable ration
+
+* A node to transform multiple features into a single-column features vector using `VectorAssembler`, as well as convert a textual representation of the label column into a numerical one using `StringIndexer`
+* A node to split the transformed data into training dataset and testing dataset using a configurable ratio
 
 The data science pipeline includes:
-* A node to train the random forrest classifier using `pyspark.ml.classification.RandomForestClassifier`
+
+* A node to train the random forest classifier using `pyspark.ml.classification.RandomForestClassifier`
 * A node to make predictions using this classifier on the testing dataset
 * A node to evaluate the model based on its predictions using `pyspark.ml.evaluation.MulticlassClassificationEvaluator`
