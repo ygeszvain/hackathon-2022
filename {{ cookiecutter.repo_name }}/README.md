@@ -2,13 +2,9 @@
 
 ## Overview
 
-This is your new Kedro project with some initial Spark configuration and an example pipeline, generated using `Kedro {{ cookiecutter.kedro_version }}` by running:
+This is your new Kedro project with some initial Spark configuration and an example pipeline, generated using `Kedro {{ cookiecutter.kedro_version }}`.
 
-```
-kedro new pyspark
-```
 This project assumes that a Spark cluster is accessible. Please refer to [Spark documentation](https://spark.apache.org/docs/latest/spark-standalone.html) on how to set one up locally.
-
 
 Take a look at the [Kedro documentation](https://kedro.readthedocs.io) to get started.
 
@@ -18,7 +14,7 @@ In order to get the best out of the template:
 
 * Don't remove any lines from the `.gitignore` file we provide
 * Make sure your results can be reproduced by following a [data engineering convention](https://kedro.readthedocs.io/en/stable/11_faq/01_faq.html#what-is-data-engineering-convention)
-* Don't commit any data to your repository
+* Don't commit data to your repository
 * Don't commit any credentials or your local configuration to your repository. Keep all your credentials and local configuration in `conf/local/`
 
 ## How to install dependencies
@@ -47,7 +43,7 @@ Have a look at the file `src/tests/test_run.py` for instructions on how to write
 kedro test
 ```
 
-To configure the coverage threshold, look at the file `.coveragerc`.
+To configure the coverage threshold, look at the `.coveragerc` file.
 
 
 ## Project dependencies
@@ -66,7 +62,7 @@ After this, if you'd like to update your project requirements, please update `sr
 
 ## How to work with Kedro and notebooks
 
-> Note: Using `kedro jupyter` or `kedro ipython` to run your notebook provides these variables in scope: `proj_dir`, `proj_name`, `conf`, `io`, `parameters` and `startup_error`.
+> Note: Using `kedro jupyter` or `kedro ipython` to run your notebook provides these variables in scope: `context`, `catalog`, and `startup_error`.
 
 ### Jupyter
 To use Jupyter notebooks in your Kedro project, you need to install Jupyter:
@@ -102,7 +98,7 @@ kedro ipython
 ```
 
 ### How to convert notebook cells to nodes in a Kedro project
-You can move Notebook code over into a Kedro project structure using a mixture of [cell tagging](https://jupyter-notebook.readthedocs.io/en/stable/changelog.html#cell-tags) and Kedro CLI commands.
+You can move notebook code over into a Kedro project structure using a mixture of [cell tagging](https://jupyter-notebook.readthedocs.io/en/stable/changelog.html#cell-tags) and Kedro CLI commands.
 
 By adding the `node` tag to a cell and running the command below, the cell's source code will be copied over to a Python file within `src/<package_name>/nodes/`:
 
