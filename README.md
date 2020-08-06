@@ -17,7 +17,7 @@ This Kedro starter contains the initialisation code for `SparkSession` in the `P
 ### Configures `MemoryDataSet` to work with Spark objects
 Out of the box, Kedro's `MemoryDataSet` works with Spark's `DataFrame`. However, it doesn't work with other Spark objects such as machine learning models unless you add further configuration. This Kedro starter demonstrates how to configure `MemoryDataSet` for Spark's machine learning model in the `catalog.yml`.
 
-> Note: The use of `MemoryDataSet` is encouraged to propagate Spark's `DataFrame` between nodes in the pipeline. A best practice is delay triggering Spark actions for as long as needed to take advantage of Spark's lazy evaluation.
+> Note: The use of `MemoryDataSet` is encouraged to propagate Spark's `DataFrame` between nodes in the pipeline. A best practice is to delay triggering Spark actions for as long as needed to take advantage of Spark's lazy evaluation.
 
 ### An example machine learning pipeline that uses only `PySpark` and `Kedro`
 
