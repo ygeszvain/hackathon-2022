@@ -42,9 +42,29 @@
 # This is a data set used by the iris classification example pipeline provided with this starter
 # template. Please feel free to remove it once you remove the example pipeline.
 
-example_iris_data:
+merchant_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/merchant_data.csv
+  layer: raw
+
+banking_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/banking_data.csv
+  layer: raw
+
+merchant_data_load:
   type: spark.SparkDataSet
-  filepath: data/01_raw/iris.csv
+  filepath: data/01_raw/merchant_data.csv
+  file_format: csv
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+
+banking_data_load:
+  type: spark.SparkDataSet
+  filepath: data/01_raw/banking_data.csv
   file_format: csv
   load_args:
     header: True
@@ -54,6 +74,12 @@ example_iris_data:
 
 # We need to set mode to 'overwrite' in save_args so when saving the dataset it is replaced each time it is run
 # for all SparkDataSets.
+merge_data@pyspark:
+  type: spark.SparkDataSet
+  filepath: data/02_intermediate/merge_data.parquet
+  save_args:
+    mode: overwrite
+
 X_train@pyspark:
   type: spark.SparkDataSet
   filepath: data/02_intermediate/X_train.parquet

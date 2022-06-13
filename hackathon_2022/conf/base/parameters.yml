@@ -1,3 +1,10 @@
 train_fraction: 0.8
 random_state: 3
 target_column: species
+user: SERVICE_INGESTION_TYGRA
+role: SERV_RL__SERVICE_INGESTION_TYGRA
+password: LoginIngest123
+warehouse: ETHOS_WAREHOUSES__INGEST__MAIN__WH
+account: fisdev.us-east-1
+merchant_table: LAKE_LOAD_HISTORY
+banking_table: LAKE_LOAD_HISTORY

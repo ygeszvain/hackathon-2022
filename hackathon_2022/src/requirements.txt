@@ -11,4 +11,4 @@ numpy~=1.21
 pytest-cov~=3.0
 pytest-mock>=1.7.1, <2.0
 pytest~=6.2
-
+snowflake-connector-python==2.7.8

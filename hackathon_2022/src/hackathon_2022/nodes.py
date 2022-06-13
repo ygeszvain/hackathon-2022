@@ -5,10 +5,59 @@ generated using Kedro 0.18.1
 
 import logging
 from typing import Dict, Tuple
+import functools
 
 import numpy as np
 import pandas as pd
 from pyspark.sql import DataFrame
+
+
+def retrieve_data_merchant_data(parameters: Dict) -> pd.DataFrame:
+    from snowflake import connector
+    ctx = connector.connect(
+        user=parameters["user"],
+        role=parameters["role"],
+        password=parameters["password"],
+        account=parameters["account"],
+        warehouse=parameters["warehouse"])
+    sql = f'select * from"ETHOS_INGESTION"."AUDIT"."{parameters["merchant_table"]}"'
+    cur = ctx.cursor()
+    cur.execute(sql)
+    snowflake_df = cur.fetch_pandas_all()
+
+    return snowflake_df
+
+
+def retrieve_data_banking_data(parameters: Dict) -> pd.DataFrame:
+    from snowflake import connector
+    ctx = connector.connect(
+        user=parameters["user"],
+        role=parameters["role"],
+        password=parameters["password"],
+        account=parameters["account"],
+        warehouse=parameters["warehouse"])
+    sql = f'select * from"ETHOS_INGESTION"."AUDIT"."{parameters["banking_table"]}"'
+    cur = ctx.cursor()
+    cur.execute(sql)
+    snowflake_df = cur.fetch_pandas_all()
+
+    return snowflake_df
+
+
+def data_cleaning_merchant(merchant_data: DataFrame, banking_data: DataFrame, parameters: Dict) -> DataFrame:
+    return merchant_data
+
+
+def data_cleaning_banking(merchant_data: DataFrame, banking_data: DataFrame, parameters: Dict) -> DataFrame:
+    return banking_data
+
+
+def merge_data(merchant_data: DataFrame, banking_data: DataFrame, parameters: Dict) -> DataFrame:
+    return merchant_data
+
+
+def ranking(merchant_data: DataFrame, banking_data: DataFrame, parameters: Dict) -> DataFrame:
+    return merchant_data
 
 
 def split_data(data: DataFrame, parameters: Dict) -> Tuple:
@@ -35,7 +84,7 @@ def split_data(data: DataFrame, parameters: Dict) -> Tuple:
 
 
 def make_predictions(
-    X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame
+        X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame
 ) -> DataFrame:
     """Uses 1-nearest neighbour classifier to create predictions.
 
