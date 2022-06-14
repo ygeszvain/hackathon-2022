@@ -5,6 +5,8 @@ generated using Kedro 0.18.1
 
 import logging
 from typing import Dict, Tuple
+
+from pandas import Series
 from pyspark.sql.window import Window
 from pyspark.sql.functions import rank
 from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler, VectorSlicer
@@ -29,7 +31,7 @@ def retrieve_data_merchant_data(parameters: Dict) -> pd.DataFrame:
         password=parameters["password"],
         account=parameters["account"],
         warehouse=parameters["warehouse"])
-    sql = f'select * from"ETHOS_INGESTION"."AUDIT"."{parameters["merchant_table"]}"'
+    sql = f'select * from"ETHOS_INGESTION"."AUDIT"."{parameters["merchant_table"]}" where mcc = 5812'
     cur = ctx.cursor()
     cur.execute(sql)
     snowflake_df = cur.fetch_pandas_all()
@@ -159,7 +161,9 @@ def feature_importance(merge_data: DataFrame, parameters: Dict) -> DataFrame:
         varlist = pd.DataFrame(list_extract)
         varlist['score'] = varlist['idx'].apply(lambda x: featureImp[x])
         return varlist.sort_values('score', ascending=False)
-    transformed = merge_data
+
+    transformed = merge_data.limit(5000)
+    print(transformed)
     input_col = 'TOT_SALES2021'
     encoding_var = [i[0] for i in transformed.dtypes if (i[1] == 'string') & (i[0] != input_col)]
     num_var = [i[0] for i in transformed.dtypes if ((i[1] == 'int') | (i[1] == 'double')) & (i[0] != input_col)]
@@ -179,6 +183,84 @@ def feature_importance(merge_data: DataFrame, parameters: Dict) -> DataFrame:
     print(result_df)
     return result_df
 
+
+def scoring_report(merge_data: DataFrame, parameters: Dict) -> DataFrame:
+    def procentual_proximity(source_data: list, weights: list) -> list:
+
+        """
+        weights - int list
+        possible values - 0 / 1
+        0 if lower values have higher weight in the data set
+        1 if higher values have higher weight in the data set
+        """
+
+        # getting data
+        data_lists = []
+        for item in source_data:
+            for i in range(len(item)):
+                try:
+                    data_lists[i].append(float(item[i]))
+                except IndexError:
+                    # generate corresponding number of lists
+                    data_lists.append([])
+                    data_lists[i].append(float(item[i]))
+
+        score_lists = []
+        # calculating each score
+        for dlist, weight in zip(data_lists, weights):
+            mind = min(dlist)
+            maxd = max(dlist)
+
+            score = []
+            # for weight 0 score is 1 - actual score
+            if weight == 0:
+                for item in dlist:
+                    try:
+                        score.append(1 - ((item - mind) / (maxd - mind)))
+                    except ZeroDivisionError:
+                        score.append(1)
+
+            elif weight == 1:
+                for item in dlist:
+                    try:
+                        score.append((item - mind) / (maxd - mind))
+                    except ZeroDivisionError:
+                        score.append(0)
+
+            # weight not 0 or 1
+            else:
+                raise ValueError("Invalid weight of %f provided" % (weight))
+
+            score_lists.append(score)
+
+        # initialize final scores
+        final_scores = [0 for i in range(len(score_lists[0]))]
+
+        # generate final scores
+        for i, slist in enumerate(score_lists):
+            for j, ele in enumerate(slist):
+                final_scores[j] = final_scores[j] + ele
+
+        # append scores to source data
+        for i, ele in enumerate(final_scores):
+            source_data[i].append(ele)
+
+        return source_data
+    print(merge_data.columns)
+    cols = parameters['scoring_cols']
+    input_list = merge_data[cols].values.tolist()
+    output_list = procentual_proximity(input_list, parameters['scoring_weight'])
+    scoring_df = pd.DataFrame(columns=parameters['scoring_cols']+['SCORE'], data=output_list)
+    # print(input_list)
+    weight = pd.DataFrame(Series(parameters['sum_weight'], index=cols, name=0))
+    merge_data['WEIGHTED_SUM'] = round(merge_data[cols].dot(weight), 2)
+    print(merge_data)
+    result_df = merge_data[['MERCHANT_ID', 'MERCHANT_NAME', 'ZIPCODE', 'BILLING_STATE', 'CITY', 'WEIGHTED_SUM']]
+    print(result_df)
+    frames = [scoring_df, result_df]
+    result_df = pd.concat(frames, axis=1)
+    result_df = result_df.drop_duplicates()
+    return result_df
 
 # def split_data(data: DataFrame, parameters: Dict) -> Tuple:
 #     """Splits data into features and targets training and test sets.

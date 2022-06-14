@@ -44,7 +44,7 @@ agg_sql: |
   from ETHOS_INGESTION.AUDIT.MERCH_TOT_TRANS
   group by 1,2,3
   )
-  select distinct trim(m.mcc) "Mccc",trim(m.BILLING_STATE) as BILLING_STATE,trim(m.CITY) as CITY,m."population",
+  select distinct trim(m.mcc) as MCC,trim(m.BILLING_STATE) as BILLING_STATE,trim(m.CITY) as CITY,
   (m."2021Tot" + b."2021Tot") as "Total2021",
   (m."2020Tot" + b."2020Tot") as "Total2020",
   (m."2019Tot" + b."2019Tot") as "Total2019",
@@ -55,3 +55,8 @@ agg_sql: |
   (m."2018CNt" + b."2018CNT") as "CNT2018"
   from mer m left join cte b
   on trim(m.mcc) = trim(b.MERCHANT_CATEGORY_XCD) and trim(m.CITY) = trim(b.MERCHANT_CITY_NAME) and trim(m.BILLING_STATE) = trim(b.MERCHANT_STATE_XCD)
+  where mcc = 5812
+sum_weight: [0.2, 0.6, 0.8, 0.2, 0.6, 0.8]
+scoring_cols: ['SALES_TREND_1', 'SALES_TREND_2', 'SALES_TREND_3', 'SALES_CNT_TREND_1',
+            'SALES_CNT_TREND_2', 'SALES_CNT_TREND_3']
+scoring_weight: [1, 1, 1, 1, 1, 1]

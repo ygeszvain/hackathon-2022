@@ -6,7 +6,7 @@ generated using Kedro 0.18.1
 from kedro.pipeline import Pipeline, node, pipeline
 
 from .nodes import retrieve_data_merchant_data, retrieve_data_banking_data, data_modeling_merchant, ranking, \
-    retrieve_data_aggregated_data, merge_data, census_data, feature_importance
+    retrieve_data_aggregated_data, merge_data, census_data, feature_importance, scoring_report
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -59,6 +59,12 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs=["merge_data@pyspark", "parameters"],
                 outputs="feature_importance_output@pandas",
                 name="feature_importance",
+            ),
+            node(
+                func=scoring_report,
+                inputs=["merge_data@pandas", "parameters"],
+                outputs="scoring_report_output@pandas",
+                name="scoring_report",
             ),
             # node(
             #     func=split_data,

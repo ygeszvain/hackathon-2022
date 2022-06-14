@@ -121,6 +121,10 @@ merge_data@pyspark:
   save_args:
     mode: overwrite
 
+merge_data@pandas:
+  type: pandas.ParquetDataSet
+  filepath: data/05_model_input/merge_data.parquet
+
 feature_importance_output@pyspark:
   type: spark.SparkDataSet
   filepath: data/07_model_output/feature_importance_output.parquet
@@ -130,6 +134,10 @@ feature_importance_output@pyspark:
 feature_importance_output@pandas:
   type: pandas.CSVDataSet
   filepath: data/07_model_output/feature_importance_output.csv
+
+scoring_report_output@pandas:
+  type: pandas.CSVDataSet
+  filepath: data/08_reporting/scoring_report_output.csv
 
 X_train@pyspark:
   type: spark.SparkDataSet
