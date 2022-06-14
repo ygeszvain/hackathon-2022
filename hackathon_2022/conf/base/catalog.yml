@@ -52,6 +52,11 @@ banking_data:
   filepath: data/01_raw/banking_data.csv
   layer: raw
 
+agg_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/agg_data.csv
+  layer: raw
+
 merchant_data_load:
   type: spark.SparkDataSet
   filepath: data/01_raw/merchant_data.csv
@@ -72,13 +77,59 @@ banking_data_load:
   save_args:
     header: True
 
+agg_data_load:
+  type: spark.SparkDataSet
+  filepath: data/01_raw/agg_data.csv
+  file_format: csv
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+
 # We need to set mode to 'overwrite' in save_args so when saving the dataset it is replaced each time it is run
 # for all SparkDataSets.
-merge_data@pyspark:
+data_modeling_merchant@pyspark:
   type: spark.SparkDataSet
-  filepath: data/02_intermediate/merge_data.parquet
+  filepath: data/03_primary/data_modeling_merchant.parquet
   save_args:
     mode: overwrite
+
+ranking_data@pyspark:
+  type: spark.SparkDataSet
+  filepath: data/04_feature/ranking_data.parquet
+  save_args:
+    mode: overwrite
+
+census_data@pandas:
+  type: pandas.CSVDataSet
+  filepath: data/05_model_input/census_data.csv
+
+census_data_load:
+  type: spark.SparkDataSet
+  filepath: data/05_model_input/census_data.csv
+  file_format: csv
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+
+merge_data@pyspark:
+  type: spark.SparkDataSet
+  filepath: data/05_model_input/merge_data.parquet
+  save_args:
+    mode: overwrite
+
+feature_importance_output@pyspark:
+  type: spark.SparkDataSet
+  filepath: data/07_model_output/feature_importance_output.parquet
+  save_args:
+    mode: overwrite
+
+feature_importance_output@pandas:
+  type: pandas.CSVDataSet
+  filepath: data/07_model_output/feature_importance_output.csv
 
 X_train@pyspark:
   type: spark.SparkDataSet

@@ -6,5 +6,52 @@ role: SERV_RL__SERVICE_INGESTION_TYGRA
 password: LoginIngest123
 warehouse: ETHOS_WAREHOUSES__INGEST__MAIN__WH
 account: fisdev.us-east-1
-merchant_table: LAKE_LOAD_HISTORY
-banking_table: LAKE_LOAD_HISTORY
+merchant_table: MERCH_TOT_TRANS
+banking_table: BANK_TOT_TRANS
+sales_trend_1_weight: 0.4
+sales_trend_2_weight: 0.6
+sale_cnt_1_weight: 0.3
+sale_cnt_2_weight: 0.7
+apiKey: 4d6427217ce53db3ebac47aee588760a275c2985
+census_lookup: {"B01001_002E": "population_male", "B01001_026E": "population_female"}
+agg_sql: |
+  with cte as(
+  Select MERCHANT_CITY_NAME,MERCHANT_STATE_XCD,MERCHANT_CATEGORY_XCD,
+  SUM(CASE WHEN YEAR_run = 2021 THEN TOT_SUM END ) "2021Tot",
+  SUM(CASE WHEN YEAR_run = 2020 THEN TOT_SUM END ) "2020Tot",
+  SUM(CASE WHEN YEAR_run = 2019 THEN TOT_SUM END ) "2019Tot",
+  SUM(CASE WHEN YEAR_run = 2019 THEN TOT_SUM END ) "2018Tot",
+
+  SUM(CASE WHEN YEAR_run = 2021 THEN TOT_CNT END ) "2021CNT",
+  SUM(CASE WHEN YEAR_run = 2020 THEN TOT_CNT END ) "2020CNT",
+  SUM(CASE WHEN YEAR_run = 2019 THEN TOT_CNT END ) "2019CNT",
+  SUM(CASE WHEN YEAR_run = 2018 THEN TOT_CNT END ) "2018CNT"
+  from
+  ETHOS_INGESTION.AUDIT.BANK_TOT_TRANS
+  group by 1,2,3
+  ),
+  mer as(
+  Select mcc,BILLING_STATE,CITY,
+  sum(POPULATION) "population",
+  sum(TOT_SALES2021) "2021Tot",
+  sum(TOT_SALES2020) "2020Tot",
+  sum(TOT_SALES2019) "2019Tot",
+  sum(TOT_SALES2019) "2018Tot",
+  sum(TOT_SALE_CNT2021) "2021CNt",
+  sum(TOT_SALE_CNT2020) "2020CNt",
+  sum(TOT_SALES_CNT2019) "2019CNt",
+  sum(TOT_SALE_CNT2018) "2018CNt"
+  from ETHOS_INGESTION.AUDIT.MERCH_TOT_TRANS
+  group by 1,2,3
+  )
+  select distinct trim(m.mcc) "Mccc",trim(m.BILLING_STATE) as BILLING_STATE,trim(m.CITY) as CITY,m."population",
+  (m."2021Tot" + b."2021Tot") as "Total2021",
+  (m."2020Tot" + b."2020Tot") as "Total2020",
+  (m."2019Tot" + b."2019Tot") as "Total2019",
+  (m."2018Tot" + b."2018Tot") as "Total2018",
+  (m."2021CNt" + b."2021CNT") as "CNT2021",
+  (m."2020CNt" + b."2020CNT") as "CNT2020",
+  (m."2019CNt" + b."2019CNT") as "CNT2019",
+  (m."2018CNt" + b."2018CNT") as "CNT2018"
+  from mer m left join cte b
+  on trim(m.mcc) = trim(b.MERCHANT_CATEGORY_XCD) and trim(m.CITY) = trim(b.MERCHANT_CITY_NAME) and trim(m.BILLING_STATE) = trim(b.MERCHANT_STATE_XCD)
